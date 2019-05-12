@@ -97,3 +97,29 @@ char *mystrrev(char *str){
     }
     return str;	
 }
+
+//数组前移
+void arrahead(int arr[],int n,int x){
+	int *temp,i;
+	temp=(int*)malloc(n*sizeof(int));
+	x%=n;
+	for(i=0;i<n-x;i++)
+		temp[i]=arr[i+x];
+	for(i=0;i<x;i++)
+		temp[i+n-x]=arr[i];
+	memcpy(arr,temp,n*sizeof(int));
+	free(temp);
+}
+
+//数组后移
+void arrback(int arr[],int n,int x){
+	int *temp,i;
+	temp=(int*)malloc(n*sizeof(int));
+	x%=n;
+	for(i=0;i<n-x;i++)
+		temp[i+x]=arr[i];
+	for(i=0;i<x;i++)
+		temp[i]=arr[i+n-x];
+	memcpy(arr,temp,n*sizeof(int));
+	free(temp);
+}
