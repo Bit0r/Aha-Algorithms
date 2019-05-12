@@ -1,3 +1,4 @@
+//大数乘法
 void mult(int a[],int n,int x){
     int i;
     for(i=0;i<n;i++)
@@ -8,6 +9,7 @@ void mult(int a[],int n,int x){
     }
 }
 
+//检测素数
 int isprime(int x){
     if(x<2)
         return 0;
@@ -21,6 +23,7 @@ int isprime(int x){
     return 1;
 }
 
+//自定义的gets函数
 char *s_gets(char *st,int n){/* 需要string.h头文件 */
     char *ret_val,*find;
     ret_val=fgets(st,n,stdin);
@@ -36,21 +39,47 @@ char *s_gets(char *st,int n){/* 需要string.h头文件 */
 }
 
 /* 筛选法求素数 */
-int *filtrate(int *a,int n){
-    int i,j;
-    a=malloc(sizeof(int)*n);//获得元素大小的素数
-    for(i=0;i<n;i++)
+long *prime(long n){
+    long i,j,*a;
+    a=malloc(sizeof(long)*n);
+    for(i=0;i<=n;i++)
         a[i]=i;
-    a[1]=0;/* 1不是素数,去掉这个元素 */
+    a[1]=0;
     for(i=2;i*i<=n;i++){
         if(a[i]==0)
             continue;
-        for(j=i+1;j<=n;j++)
+        for(j=i*i;j<=n;j++)
             if(a[j]&&a[j]%a[i]==0)
                 a[j]=0;
     }
-    for(i=0,j=0;i<n;i++)
+    for(i=j=0;i<=n;i++)
         if(a[i])
             a[j++]=a[i];
-    return realloc(a,sizeof(int)*j);
+    a[j]=0;
+    return a;
+}
+
+//大数阶乘
+int factorial(int n){
+	int i, j, m = 0, w,a[10000],c;
+
+	a[0] = 1;
+	for (i = 1; i <= n; i++){
+		c = 0;
+		for (j = 0; j <= m; j++){
+			a[j] = a[j] * i + c;
+			c = a[j] / 10000;
+			a[j] = a[j] % 10000;
+		}
+		if (c > 0){
+			m++;
+			a[m] = c;
+		}
+	}
+
+	w = m * 4 + log10(a[m]) + 1;
+	printf("\n%d", a[m]);
+	for (i = m - 1; i >= 0; i--)
+		printf("%4.4d", a[i]);
+	return w;
 }
