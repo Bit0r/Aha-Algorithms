@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<stdbool.h>
 
 int n,m,next[][2]={{0,1},{1,0},{0,-1},{-1,0}},x,y,p,q;
 typedef struct{
@@ -17,11 +18,15 @@ typedef struct{
 	Node *rear;
 	int items;
 }Que;
+Que hum={NULL,NULL,0};
 
 void input(int [n][m]);
-void dfs(int [n][m],int [n][m],int [],int);
+int bfs(int [n][m],int [n][m]);
+void queadd(Que *,Item *);
+void quedel(Que *,Item *);
 
 int main(){
+	int step;
 	Item start;
 	scanf("%d%d",&n,&m);
 	int map[n][m],book[n][m];
@@ -32,8 +37,11 @@ int main(){
 	memset(book,0,sizeof(int)*n*m);
 	book[start.x][start.y]=1;
 	queadd(&hum,&start);
-	bfs(map,book);
-	if(flag)
+	step=bfs(map,book);
+	if(step>=0)
+		printf("%d",step);
+	else
+		puts("No Way!");
 	return 0;
 }
 
@@ -47,22 +55,21 @@ void input(int map[n][m]){
 int bfs(int map[n][m],int book[n][m]){
 	bool flag=0;
 	int i;
-	Que hum={NULL,NULL,0};
 	Item temp,place;
-	while(hum->front!=NULL){
+	while(hum.front!=NULL){
 		quedel(&hum,&place);
 		for(i=0;i<4;i++){
 			temp.x=place.x+next[i][0];
 			temp.y=place.y+next[i][1];
-			if(temp.x>=0&&temp.x<n&&temp.y>=0&&temp.y<m\
-			&&map[temp.x][temp.y]==0&&book[temp.x][temp.y]==0){
-				book[temp.x][temp.y]=1;
-				temp.s=place.s+1;
-				queadd(&hum,temp);
-			}
+			temp.s=place.s+1;
 			if(temp.x==p&&temp.y==q){
 				flag=1;
 				break;
+			}
+			if(temp.x>=0&&temp.x<n&&temp.y>=0&&temp.y<m\
+			&&map[temp.x][temp.y]==0&&book[temp.x][temp.y]==0){
+				book[temp.x][temp.y]=1;
+				queadd(&hum,&temp);
 			}
 		}
 		if(flag==1)
@@ -77,10 +84,10 @@ int bfs(int map[n][m],int book[n][m]){
 void queadd(Que *pque,Item *pitem){
 	Node *pnew=malloc(sizeof(Node));
 	pnew->next=NULL;
-	pnew->next=*pitem;
-	if(pque==NULL){
+	pnew->data=*pitem;
+	if(pque->front==NULL){
 		pque->front=pque->rear=pnew;
-		items=1;
+		pque->items=1;
 	}else{
 		pque->rear->next=pnew;
 		pque->rear=pnew;
@@ -89,11 +96,11 @@ void queadd(Que *pque,Item *pitem){
 }
 
 void quedel(Que *pque,Item *pitem){
-	Node temp=pque->front;
-	*pitem=pque->front.data;
+	Node *temp=pque->front;
+	*pitem=pque->front->data;
 	pque->front=pque->front->next;
 	pque->items--;
 	if(pque->front==NULL)
-		rear=NULL;
+		pque->rear=NULL;
 	free(temp);
 }
