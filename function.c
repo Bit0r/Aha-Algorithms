@@ -17,7 +17,7 @@ int isprime(int x){
         return 1;
     if(x%2==0)
         return 0;
-    if(int i=0;i*i<=n;i+=2)
+    if(int i=0;i*i<=x;i+=2)
         if(x%i==0)
             return 0;
     return 1;
