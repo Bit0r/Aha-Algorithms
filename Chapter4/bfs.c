@@ -1,9 +1,17 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
-int q[64][3], map[64][64], m, n, start[2], end[2];
+int map[64][64], m, n, start[2], end[2];
+
+typedef struct {
+    int queue[64][3], front, rear;
+} Queue;
+typedef struct {
+    int stack[64][2], top;
+} Stack;
+
+Queue path;
 
 void input() {
     int i, j;
@@ -12,50 +20,58 @@ void input() {
             scanf("%d", &map[i][j]);
 }
 
-int bfs() {
-    int front, rear, k, next_i, next_j;
+void bfs() {
+    int k, next_i, next_j;
     int next[4][2] = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};
     bool book[64][64];
     memset(book, 0, sizeof(bool) * 64 * 64);
-    q[0][0] = start[0];
-    q[0][1] = start[1];
-    q[0][2] = -1;
-    for (front = rear = 0; front <= rear; front++) {
+    path.queue[0][0] = start[0];
+    path.queue[0][1] = start[1];
+    path.queue[0][2] = -1;
+    for (path.front = path.rear = 0;
+         path.front <= path.rear && !(path.queue[path.rear][0] == end[0] &&
+                                      path.queue[path.rear][1] == end[1]);
+         path.front++) {
         for (k = 0; k < 4; k++) {
-            next_i = q[front][0] + next[k][0];
-            next_j = q[front][1] + next[k][1];
+            next_i = path.queue[path.front][0] + next[k][0];
+            next_j = path.queue[path.front][1] + next[k][1];
             if (next_i <= m && next_i > 0 && next_j > 0 && next_j <= n &&
                 map[next_i][next_j] == 0 && !book[next_i][next_j]) {
-                rear++;
-                q[rear][0] = next_i;
-                q[rear][1] = next_j;
-                q[rear][2] = front;
+                path.rear++;
+                path.queue[path.rear][0] = next_i;
+                path.queue[path.rear][1] = next_j;
+                path.queue[path.rear][2] = path.front;
                 book[next_i][next_j] = true;
             }
-            if (q[rear][0] == end[0] && q[rear][1] == end[1])
-                return rear;
         }
     }
-    return -1;
 }
 
-void output(int rear) {
-    int stack[64][2], pre, top;
-    for (top = 0, pre = rear; q[pre][2] != -1; top++, pre = q[pre][2]) {
-        stack[top][0] = q[pre][0];
-        stack[top][1] = q[pre][1];
+void output() {
+    Stack result;
+    int pre;
+    result.top = -1;
+    if (!(path.queue[path.rear][0] == end[0] &&
+          path.queue[path.rear][1] == end[1]))
+        puts("没有能走出迷宫的路线");
+    for (pre = path.rear; path.queue[pre][2] != -1; pre = path.queue[pre][2]) {
+        result.top++;
+        result.stack[result.top][0] = path.queue[pre][0];
+        result.stack[result.top][1] = path.queue[pre][1];
     }
-    stack[top][0] = start[0];
-    stack[top][1] = start[1];
-    for (; top > 0; top--)
-        printf("(%d,%d)->", stack[top][0], stack[top][1]);
-    printf("(%d,%d)", end[0], end[1]);
+    printf("(%d,%d)", start[0], start[1]);
+    while (result.top >= 0) {
+        printf("->(%d,%d)", result.stack[result.top][0],
+               result.stack[result.top][1]);
+        result.top--;
+    }
 }
 
 int main() {
     scanf("%d%d", &m, &n);
     input();
     scanf("%d%d%d%d", start, start + 1, end, end + 1);
-    output(bfs());
+    bfs();
+    output();
     return 0;
 }
